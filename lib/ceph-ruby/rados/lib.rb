@@ -1,5 +1,7 @@
 require "ffi"
 
+# see https://github.com/ceph/ceph/blob/v0.48.2argonaut/src/pybind/rados.py
+
 module CephRuby
   class Rados
     module Lib

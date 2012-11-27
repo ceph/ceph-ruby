@@ -1,5 +1,7 @@
 require "ffi"
 
+# see https://github.com/ceph/ceph/blob/v0.48.2argonaut/src/pybind/rbd.py
+
 module CephRuby
   class Rbd
     module Lib
@@ -21,9 +23,9 @@ module CephRuby
       attach_function 'rbd_resize', [:pointer, :size_t], :int
 
       class StatStruct < FFI::Struct
-        layout :size, :int,
-          :obj_size, :int,
-          :num_objs, :int,
+        layout :size, :uint64,
+          :obj_size, :uint64,
+          :num_objs, :uint64,
           :order, :int,
           :block_name_prefix, [:char, 24],
           :parent_pool, :int,
