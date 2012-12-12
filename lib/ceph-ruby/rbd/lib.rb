@@ -22,14 +22,17 @@ module CephRuby
       attach_function 'rbd_stat', [:pointer, :pointer, :size_t], :int
       attach_function 'rbd_resize', [:pointer, :size_t], :int
 
+      attach_function 'rbd_copy', [:pointer, :pointer, :string], :int
+      attach_function 'rbd_copy_with_progress', [:pointer, :pointer, :string, :pointer, :pointer], :int
+
       class StatStruct < FFI::Struct
         layout :size, :uint64,
           :obj_size, :uint64,
           :num_objs, :uint64,
           :order, :int,
           :block_name_prefix, [:char, 24],
-          :parent_pool, :int,
-          :parent_name, [:char, 96]
+          :parent_pool, :int, # deprecated
+          :parent_name, [:char, 96] # deprecated
       end
     end
   end

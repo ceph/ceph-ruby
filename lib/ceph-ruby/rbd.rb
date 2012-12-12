@@ -48,7 +48,7 @@ module CephRuby
     def destroy(name)
       raise ArgumentError, "name must be a string" unless name.is_a?(String)
       ret = Lib.rbd_remove(pool.ioctx, name)
-      raise "error destroying rbd image '#{name}': #{ret}" if ret < 0
+      raise "error destroying rbd image '#{name}': #{ret}" if ret < 0 && ret != -Errno::ENOENT::Errno
     end
   end
 end

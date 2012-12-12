@@ -63,6 +63,14 @@ module CephRuby
         stat[:size]
       end
 
+      def copy_to(dst_pool, dst_name)
+        require_state(:initialized)
+        raise ArgumentError, "dst_pool must be a pool" unless dst_pool.is_a?(Rados::Pool)
+        raise ArgumentError, "dst_name must be an string" unless dst_name.is_a?(String)
+        ret = Lib.rbd_copy(image, dst_pool.ioctx, dst_name)
+        raise "error copying image to '#{dst_pool.name}/#{dst_name}'" if ret < 0
+      end
+
       private
 
       def require_state(*states)
