@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = CephRuby::VERSION
   gem.authors       = ["Corin Langosch"]
   gem.email         = ["info@corinlangosch.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Easy Management of Ceph}
+  gem.summary       = %q{Easy Management of Ceph}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
