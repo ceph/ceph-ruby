@@ -3,15 +3,15 @@ require "ffi"
 # see https://github.com/ceph/ceph/blob/v0.48.2argonaut/src/pybind/rbd.py
 
 module CephRuby
-  class Rbd
-    module Lib
+  module Lib
+    module Rbd
       extend FFI::Library
 
       ffi_lib ['rbd', 'librbd.so.1']
 
       attach_function 'rbd_version', [:pointer, :pointer, :pointer], :void
 
-      attach_function 'rbd_create', [:pointer, :string, :size_t, :pointer], :int
+      attach_function 'rbd_create2', [:pointer, :string, :size_t, :uint64, :pointer], :int
       attach_function 'rbd_remove', [:pointer, :string], :int
 
       attach_function 'rbd_open', [:pointer, :string, :pointer, :string], :int
@@ -33,6 +33,18 @@ module CephRuby
           :block_name_prefix, [:char, 24],
           :parent_pool, :int, # deprecated
           :parent_name, [:char, 96] # deprecated
+      end
+
+      def self.version
+        major = FFI::MemoryPointer.new(:int)
+        minor= FFI::MemoryPointer.new(:int)
+        extra = FFI::MemoryPointer.new(:int)
+        rbd_version(major, minor, extra)
+        {
+          :major => major.get_int(0),
+          :minor => minor.get_int(0),
+          :extra => extra.get_int(0),
+        }
       end
     end
   end
