@@ -1,3 +1,5 @@
+require "active_support/core_ext/module/delegation"
+
 require "ffi"
 
 require "ceph-ruby/lib/rados"
