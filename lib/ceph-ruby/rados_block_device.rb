@@ -29,7 +29,7 @@ module CephRuby
       end
     end
 
-    def create(size, features = 0, order = 0)
+    def create(size, features = 0, order = 26)
       order_p = FFI::MemoryPointer.new(:int)
       order_p.put_int(0, order)
       ret = Lib::Rbd.rbd_create2(pool.handle, name, size, features, order_p)
