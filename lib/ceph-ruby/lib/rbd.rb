@@ -46,6 +46,10 @@ module CephRuby
           :extra => extra.get_int(0),
         }
       end
+
+      def self.version_string
+        "#{version[:major]}.#{version[:minor]}.#{version[:extra]}"
+      end
     end
   end
 end

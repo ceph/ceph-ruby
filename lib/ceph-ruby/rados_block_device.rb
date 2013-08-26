@@ -7,7 +7,6 @@ module CephRuby
     def initialize(pool, name)
       self.pool = pool
       self.name = name
-
       if block_given?
         yield(self)
         close
@@ -15,6 +14,7 @@ module CephRuby
     end
 
     def exists?
+      log("exists?")
       handle_p = FFI::MemoryPointer.new(:pointer)
       ret = Lib::Rbd.rbd_open(pool.handle, name, handle_p, nil)
       case ret
@@ -30,6 +30,7 @@ module CephRuby
     end
 
     def create(size, features = 0, order = 26)
+      log("create size #{size}, features #{features}, order #{order}")
       order_p = FFI::MemoryPointer.new(:int)
       order_p.put_int(0, order)
       ret = Lib::Rbd.rbd_create2(pool.handle, name, size, features, order_p)
@@ -38,6 +39,7 @@ module CephRuby
 
     def open
       return if open?
+      log("open")
       handle_p = FFI::MemoryPointer.new(:pointer)
       ret = Lib::Rbd.rbd_open(pool.handle, name, handle_p, nil)
       raise SystemCallError.new("open of '#{name}' failed", -ret) if ret < 0
@@ -46,12 +48,14 @@ module CephRuby
 
     def close
       return unless open?
+      log("close")
       Lib::Rbd.rbd_close(handle)
       self.handle = nil
     end
 
     def destroy
       close if open?
+      log("destroy")
       ret = Lib::Rbd.rbd_remove(pool.handle, name)
       raise SystemCallError.new("destroy of '#{name}' failed", -ret) if ret < 0
     end
@@ -59,6 +63,7 @@ module CephRuby
     def write(offset, data)
       ensure_open
       size = data.bytesize
+      log("write offset #{offset}, size #{size}")
       ret = Lib::Rbd.rbd_write(handle, offset, size, data)
       raise SystemCallError.new("write of #{size} bytes to '#{name}' at #{offset} failed", -ret) if ret < 0
       raise Errno::EIO.new("wrote only #{ret} of #{size} bytes to '#{name}' at #{offset}") if ret < size
@@ -66,6 +71,7 @@ module CephRuby
 
     def read(offset, size)
       ensure_open
+      log("read offset #{offset}, size #{size}")
       data_p = FFI::MemoryPointer.new(:char, size)
       ret = Lib::Rbd.rbd_read(handle, offset, size, data_p)
       raise SystemCallError.new("read of #{size} bytes from '#{name}' at #{offset} failed", -ret) if ret < 0
@@ -74,6 +80,7 @@ module CephRuby
 
     def stat
       ensure_open
+      log("stat")
       stat = Lib::Rbd::StatStruct.new
       ret = Lib::Rbd.rbd_stat(handle, stat, stat.size)
       raise SystemCallError.new("stat of '#{name}' failed", -ret) if ret < 0
@@ -84,6 +91,7 @@ module CephRuby
 
     def resize(size)
       ensure_open
+      log("resize size #{size}")
       ret = Lib::Rbd.rbd_resize(handle, size)
       raise SystemCallError.new("resize of '#{name}' to #{size} failed", -ret) if ret < 0
     end
@@ -101,6 +109,7 @@ module CephRuby
         dst_pool = pool
       end
       dst_pool.ensure_open
+      log("copy_to #{dst_pool.name}/#{dst_name}")
       ret = Lib::Rbd.rbd_copy(handle, dst_pool.handle, dst_name)
       raise SystemCallError.new("copy of '#{name}' to '#{dst_pool.name}/#{dst_name}' failed", -ret) if ret < 0
     end
@@ -114,6 +123,10 @@ module CephRuby
     def ensure_open
       return if open?
       open
+    end
+
+    def log(message)
+      CephRuby.log("rbd image #{pool.name}/#{name} #{message}")
     end
   end
 end

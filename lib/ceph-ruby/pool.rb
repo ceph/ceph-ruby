@@ -5,7 +5,6 @@ module CephRuby
     def initialize(cluster, name)
       self.cluster = cluster
       self.name = name
-
       if block_given?
         yield(self)
         close
@@ -13,6 +12,7 @@ module CephRuby
     end
 
     def exists?
+      log("exists?")
       ret = Lib::Rados.rados_pool_lookup(cluster.handle, name)
       return true if ret >= 0
       return false if ret == -Errno::ENOENT::Errno
@@ -21,6 +21,7 @@ module CephRuby
 
     def open
       return if open?
+      log("open")
       handle_p = FFI::MemoryPointer.new(:pointer)
       ret = Lib::Rados.rados_ioctx_create(cluster.handle, name, handle_p)
       raise SystemCallError.new("creation of io context for '#{name}' failed", -ret) if ret < 0
@@ -29,6 +30,7 @@ module CephRuby
 
     def close
       return unless open?
+      log("close")
       Lib::Rados.rados_ioctx_destroy(handle)
       self.handle = nil
     end
@@ -52,6 +54,10 @@ module CephRuby
     def ensure_open
       return if open?
       open
+    end
+
+    def log(message)
+      CephRuby.log("pool #{name} #{message}")
     end
   end
 end

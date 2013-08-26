@@ -1,4 +1,5 @@
 require "active_support/core_ext/module/delegation"
+require "active_support/core_ext/module/attribute_accessors"
 
 require "ffi"
 
@@ -12,4 +13,10 @@ require "ceph-ruby/rados_block_device"
 require "ceph-ruby/rados_object"
 
 module CephRuby
+  mattr_accessor :logger
+
+  def self.log(message)
+    return unless logger
+    logger.info("CephRuby: #{message}")
+  end
 end
