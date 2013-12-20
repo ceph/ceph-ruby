@@ -20,6 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
+    require "ceph-ruby"
+
     # version information
     puts CephRuby::Lib::Rados.version_string
     puts CephRuby::Lib::Rbd.version_string
@@ -44,7 +46,7 @@ Or install it yourself as:
     pp image.stat
     image.close
 
-    # finish
+    # clean up
     pool.close
     cluster.shutdown
 
