@@ -6,11 +6,11 @@ require 'ceph-ruby/version'
 Gem::Specification.new do |gem|
   gem.name          = "ceph-ruby"
   gem.version       = CephRuby::VERSION
-  gem.authors       = ["Corin Langosch"]
-  gem.email         = ["info@corinlangosch.com"]
-  gem.description   = %q{Easy Management of Ceph}
-  gem.summary       = %q{Easy Management of Ceph}
-  gem.homepage      = ""
+  gem.authors       = ["Netskin GmbH", "Corin Langosch"]
+  gem.email         = ["info@netskin.com", "info@corinlangosch.com"]
+  gem.description   = %q{Easy management of Ceph}
+  gem.summary       = %q{Easy management of Ceph Distributed Storage System using ruby}
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
