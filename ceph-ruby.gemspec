@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["info@netskin.com", "info@corinlangosch.com"]
   gem.description   = %q{Easy management of Ceph}
   gem.summary       = %q{Easy management of Ceph Distributed Storage System using ruby}
-  gem.homepage      = "http://github.com/netskin/ceph-ruby"
+  gem.homepage      = "https://github.com/ceph/ceph-ruby"
   gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($/)
