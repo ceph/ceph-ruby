@@ -31,6 +31,15 @@ Or install it yourself as:
     pool = cluster.pool("my-pool-xyz")
     pool.open
 
+    # CephRuby::Cluster.new currently accepts up to three setings.
+    # conf_file - path to your ceph.conf file (default: /etc/ceph/ceph.conf)
+    # options hash:
+    #   :user    - cephx user to authenticate against (default: client.admin)
+                     (would look for a keyring file at: '/etc/ceph/<cluster>.<user>.keyring')
+    #   :cluster - ceph cluster to connect to (default: ceph)
+
+    cluster = CephRuby::Cluster.new "/etc/ceph/us-east.conf", {cluster: 'us-east', user: 'client.amazing'}
+
     # simple example for using rados objects
     object = pool.rados_object("my-object-xyz")
     object.write(0, "This is a Test!")

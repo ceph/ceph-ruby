@@ -12,6 +12,7 @@ module CephRuby
       attach_function 'rados_version', [:pointer, :pointer, :pointer], :void
 
       attach_function 'rados_create', [:pointer, :string], :int
+      attach_function 'rados_create2', [:pointer, :string, :string, :int], :int
       attach_function 'rados_connect', [:pointer], :int
       attach_function 'rados_conf_read_file', [:pointer, :string], :int
       attach_function 'rados_shutdown', [:pointer], :void

@@ -2,12 +2,20 @@ module CephRuby
   class Cluster
     attr_accessor :handle
 
-    def initialize(config_path = "/etc/ceph/ceph.conf")
+    # Creates a connection to a given ceph Cluster
+    # Takes optional paramaters config_path, and an options hash
+    # config_path string - path to ceph configuration file
+    # options:
+    #  :cluster - cluster name (default: ceph)
+    #  :user    - cephx key file and user to use (default: client.admin)
+    def initialize(config_path = '/etc/ceph/ceph.conf', options = {})
+      cluster = options.fetch(:cluster, 'ceph')
+      user = options.fetch(:user, 'client.admin')
       log("init lib rados #{Lib::Rados.version_string}, lib rbd #{Lib::Rbd.version_string}")
 
       handle_p = FFI::MemoryPointer.new(:pointer)
-      ret = Lib::Rados.rados_create(handle_p, nil)
-      raise SystemCallError.new("open of cluster failed", -ret) if ret < 0
+      ret = Lib::Rados.rados_create2(handle_p, cluster, user, 0)
+      raise SystemCallError.new('open of cluster failed', -ret) if ret < 0
       self.handle = handle_p.get_pointer(0)
 
       setup_using_file(config_path)
