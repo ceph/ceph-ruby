@@ -15,14 +15,17 @@ module CephRuby
       connect
 
       if block_given?
-        yield(self)
-        shutdown
+        begin
+          yield(self)
+        ensure
+          close
+        end
       end
     end
 
-    def shutdown
+    def close
       return unless handle
-      log("shutdown")
+      log("close")
       Lib::Rados.rados_shutdown(handle)
       self.handle = nil
     end

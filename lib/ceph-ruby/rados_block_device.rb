@@ -8,8 +8,11 @@ module CephRuby
       self.pool = pool
       self.name = name
       if block_given?
-        yield(self)
-        close
+        begin
+          yield(self)
+        ensure
+          close
+        end
       end
     end
 
