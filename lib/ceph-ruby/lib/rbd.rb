@@ -25,6 +25,15 @@ module CephRuby
       attach_function 'rbd_copy', [:pointer, :pointer, :string], :int
       attach_function 'rbd_copy_with_progress', [:pointer, :pointer, :string, :pointer, :pointer], :int
 
+      attach_function 'rbd_snap_create', [:pointer, :string], :int
+      attach_function 'rbd_snap_remove', [:pointer, :string], :int
+      attach_function 'rbd_snap_protect', [:pointer, :string], :int
+      attach_function 'rbd_snap_unprotect', [:pointer, :string], :int
+      attach_function 'rbd_snap_set', [:pointer, :string], :int
+
+      attach_function 'rbd_clone', [:pointer, :string, :string, :pointer, :string, :uint64, :pointer], :int
+      attach_function 'rbd_flatten', [:pointer], :int
+
       class StatStruct < FFI::Struct
         layout :size, :uint64,
           :obj_size, :uint64,

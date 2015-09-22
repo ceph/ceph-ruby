@@ -1,5 +1,10 @@
 module CephRuby
   class RadosBlockDevice
+    FEATURE_LAYERING = 1
+    FEATURE_STRIPING_V2 = 2
+    FEATURE_EXCLUSIVE_LOCK = 4
+    FEATURE_OBJECT_MAP = 8
+
     attr_accessor :pool, :name, :handle
 
     delegate :cluster, :to => :pool
@@ -32,7 +37,7 @@ module CephRuby
       end
     end
 
-    def create(size, features = 0, order = 26)
+    def create(size, features = 0, order = 0)
       log("create size #{size}, features #{features}, order #{order}")
       order_p = FFI::MemoryPointer.new(:int)
       order_p.put_int(0, order)
@@ -115,6 +120,64 @@ module CephRuby
       log("copy_to #{dst_pool.name}/#{dst_name}")
       ret = Lib::Rbd.rbd_copy(handle, dst_pool.handle, dst_name)
       raise SystemCallError.new("copy of '#{name}' to '#{dst_pool.name}/#{dst_name}' failed", -ret) if ret < 0
+    end
+
+    def snapshot_create(name)
+      log("snapshot_create #{name}")
+      ensure_open
+      ret = Lib::Rbd.rbd_snap_create(handle, name)
+      raise SystemCallError.new("snapshot create '#{name}' of '#{self.name}' failed", -ret) if ret < 0
+    end
+
+    def snapshot_destroy(name)
+      log("snapshot_destroy #{name}")
+      ensure_open
+      ret = Lib::Rbd.rbd_snap_remove(handle, name)
+      raise SystemCallError.new("snapshot destroy '#{name}' of '#{self.name}' failed", -ret) if ret < 0
+    end
+
+    def snapshot_protect(name)
+      log("snapshot_protect #{name}")
+      ensure_open
+      ret = Lib::Rbd.rbd_snap_protect(handle, name)
+      raise SystemCallError.new("snapshot protect '#{name}' of '#{self.name}' failed", -ret) if ret < 0
+    end
+
+    def snapshot_unprotect(name)
+      log("snapshot_unprotect #{name}")
+      ensure_open
+      ret = Lib::Rbd.rbd_snap_unprotect(handle, name)
+      raise SystemCallError.new("snapshot unprotect '#{name}' of '#{self.name}' failed", -ret) if ret < 0
+    end
+
+    def snapshot_activate(name)
+      log("snapshot_activate #{name}")
+      ensure_open
+      ret = Lib::Rbd.rbd_snap_set(handle, name)
+      raise SystemCallError.new("activate snapshot '#{name}' of '#{self.name}' failed", -ret) if ret < 0
+    end
+
+    def clone(snapshot, dst_name, dst_pool = nil, features = 0, order = 0)
+      ensure_open
+      case dst_pool
+      when String
+        dst_pool = cluster.pool(dst_pool)
+      when nil
+        dst_pool = pool
+      end
+      dst_pool.ensure_open
+      log("clone snapshot #{snapshot} to #{dst_pool.name}/#{dst_name} features #{features} order #{order}")
+      order_p = FFI::MemoryPointer.new(:int)
+      order_p.put_int(0, order)
+      ret = Lib::Rbd.rbd_clone(pool.handle, name, snapshot, dst_pool.handle, dst_name, features, order_p)
+      raise SystemCallError.new("clone of '#{name}@#{snapshot}' to '#{dst_pool.name}/#{dst_name}' failed", -ret) if ret < 0
+    end
+
+    def flatten
+      log("flatten")
+      ensure_open
+      ret = Lib::Rbd.rbd_flatten(handle)
+      raise SystemCallError.new("flatten of '#{name}' failed", -ret) if ret < 0
     end
 
     # helper methods below
