@@ -21,6 +21,8 @@ module CephRuby
       attach_function 'rbd_read', [:pointer, :off_t, :size_t, :buffer_out], :int
       attach_function 'rbd_stat', [:pointer, :pointer, :size_t], :int
       attach_function 'rbd_resize', [:pointer, :size_t], :int
+      attach_function 'rbd_get_size', [:pointer, :pointer], :int
+      attach_function 'rbd_get_features', [:pointer, :pointer], :int
 
       attach_function 'rbd_copy', [:pointer, :pointer, :string], :int
       attach_function 'rbd_copy_with_progress', [:pointer, :pointer, :string, :pointer, :pointer], :int

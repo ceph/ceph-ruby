@@ -97,15 +97,29 @@ module CephRuby
       end
     end
 
+    def size
+      ensure_open
+      log("size")
+      size_p = FFI::MemoryPointer.new(:uint64)
+      ret = Lib::Rbd.rbd_get_size(handle, size_p)
+      raise SystemCallError.new("size of '#{name}' failed", -ret) if ret < 0
+      size_p.read_uint64
+    end
+
+    def features
+      ensure_open
+      log("features")
+      features_p = FFI::MemoryPointer.new(:uint64)
+      ret = Lib::Rbd.rbd_get_features(handle, features_p)
+      raise SystemCallError.new("features of '#{name}' failed", -ret) if ret < 0
+      features_p.read_uint64
+    end
+
     def resize(size)
       ensure_open
       log("resize size #{size}")
       ret = Lib::Rbd.rbd_resize(handle, size)
       raise SystemCallError.new("resize of '#{name}' to #{size} failed", -ret) if ret < 0
-    end
-
-    def size
-      stat[:size]
     end
 
     def copy_to(dst_name, dst_pool = nil)
