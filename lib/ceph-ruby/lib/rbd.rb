@@ -13,6 +13,7 @@ module CephRuby
 
       attach_function 'rbd_create2', [:pointer, :string, :size_t, :uint64, :pointer], :int
       attach_function 'rbd_remove', [:pointer, :string], :int
+      attach_function 'rbd_rename', [:pointer, :string, :string], :int
 
       attach_function 'rbd_open', [:pointer, :string, :pointer, :string], :int
       attach_function 'rbd_close', [:pointer], :void
