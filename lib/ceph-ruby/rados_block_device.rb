@@ -68,6 +68,13 @@ module CephRuby
       raise SystemCallError.new("destroy of '#{name}' failed", -ret) if ret < 0
     end
 
+    def rename(new_name)
+      close if open?
+      log("rename")
+      ret = Lib::Rbd.rbd_rename(pool.handle, name, new_name)
+      raise SystemCallError.new("rename of '#{name}' failed", -ret) if ret < 0
+    end
+
     def write(offset, data)
       ensure_open
       size = data.bytesize
