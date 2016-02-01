@@ -23,7 +23,6 @@ module CephRuby
       log("write offset #{offset}, size #{size}")
       ret = Lib::Rados.rados_write(pool.handle, name, data, size, offset)
       raise SystemCallError.new("write of #{size} bytes to '#{name}' at #{offset} failed", -ret) if ret < 0
-      raise Errno::EIO.new("wrote only #{ret} of #{size} bytes to '#{name}' at #{offset}") if ret < size
     end
 
     def read(offset, size)
