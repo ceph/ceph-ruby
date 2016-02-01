@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'ceph-ruby/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "ceph-ruby-ffi19"
+  gem.name          = "ceph-ruby"
   gem.version       = CephRuby::VERSION
   gem.authors       = ["Netskin GmbH", "Corin Langosch"]
   gem.email         = ["info@netskin.com", "info@corinlangosch.com"]
