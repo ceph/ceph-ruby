@@ -2,9 +2,7 @@ module CephRuby
   class Cluster
     attr_accessor :handle
 
-    def initialize(options = {})
-      options[:config_path] ||= "/etc/ceph/ceph.conf"
-
+    def initialize(config_path = "/etc/ceph/ceph.conf", options = {})
       log("init lib rados #{Lib::Rados.version_string}, lib rbd #{Lib::Rbd.version_string}")
 
       handle_p = FFI::MemoryPointer.new(:pointer)
@@ -12,7 +10,7 @@ module CephRuby
       raise SystemCallError.new("open of cluster failed", -ret) if ret < 0
       self.handle = handle_p.get_pointer(0)
 
-      setup_using_file(options[:config_path])
+      setup_using_file(config_path)
 
       connect
 
