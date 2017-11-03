@@ -38,6 +38,16 @@ module CephRuby
       self.handle = nil
     end
 
+    def list
+      log("list")
+      size = FFI::MemoryPointer.new(:size_t)
+      size.write(:size_t, 512)
+      list_p = FFI::MemoryPointer.new(:char, 512)
+      ret = Lib::Rbd.rbd_list(self.handle, list_p, size)
+      # raise SystemCallError.new("list of images failed", -ret) if ret < 0
+      # list_p.get_bytes(0, ret)
+    end
+
     def rados_object(name, &block)
       ensure_open
       RadosObject.new(self, name, &block)
