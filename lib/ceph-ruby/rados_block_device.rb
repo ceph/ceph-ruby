@@ -236,6 +236,46 @@ module CephRuby
       nil
     end
 
+    def get_parent_info
+      log("get_parent_info")
+      ensure_open
+
+      size = 8
+
+      parent_poolname_p = nil
+      parent_name_p = nil
+      parent_snapname_p = nil
+
+      loop do
+        size = size * 2
+        break if size > 4096
+
+        parent_poolname_p = FFI::MemoryPointer.new(:char, size)
+        parent_name_p = FFI::MemoryPointer.new(:char, size)
+        parent_snapname_p = FFI::MemoryPointer.new(:char, size)
+
+        ret = Lib::Rbd.rbd_get_parent_info(handle,
+                                           parent_poolname_p, size,
+                                           parent_name_p, size,
+                                           parent_snapname_p, size)
+
+
+        next if ret == -Errno::ERANGE::Errno
+
+        raise SystemCallError.new("Query parent info size failed:") if ret < 0
+
+        break
+      end
+
+      raise SystemCallError.new("Query parent info size failed:") if size > 4096
+
+      {
+        pool: parent_poolname_p.get_bytes(0, size).split("\0")[0],
+        name: parent_name_p.get_bytes(0, size).split("\0")[0],
+        snap: parent_snapname_p.get_bytes(0, size).split("\0")[0]
+      }
+    end
+
     # helper methods below
 
     def open?
