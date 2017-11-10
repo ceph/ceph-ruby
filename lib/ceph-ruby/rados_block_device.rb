@@ -205,23 +205,23 @@ module CephRuby
       log("metadata")
       ensure_open
 
-      keys_size_p = FFI::MemoryPointer.new(:size_t)
+      keys_size_p   = FFI::MemoryPointer.new(:size_t)
       values_size_p = FFI::MemoryPointer.new(:size_t)
 
-      ret = Lib::Rbd.rbd_metadata_list(handle, "", 0, nil, keys_size_p, nil, values_size_p)
+      ret = Lib::Rbd.rbd_metadata_list(handle, '', 0, nil, keys_size_p, nil, values_size_p)
 
       return {} if ret == 0
 
-      raise SystemCallError.new("Query size of metadata failed") if ret != -Errno::ERANGE::Errno
+      raise SystemCallError.new('Query of metadata size failed') if ret != -Errno::ERANGE::Errno
 
-      keys_p = FFI::MemoryPointer.new(:char, keys_size_p.get_int(0))
+      keys_p   = FFI::MemoryPointer.new(:char, keys_size_p.get_int(0))
       values_p = FFI::MemoryPointer.new(:char, values_size_p.get_int(0))
 
       ret = Lib::Rbd.rbd_metadata_list(handle, "", 0, keys_p, keys_size_p, values_p, values_size_p)
 
-      raise SystemCallError.new("Query of metadata failed") if ret < 0
+      raise SystemCallError.new('Query of metadata failed') if ret < 0
 
-      keys = keys_p.get_bytes(0, keys_size_p.get_int(0)).split("\0")
+      keys   = keys_p.get_bytes(0, keys_size_p.get_int(0)).split("\0")
       values = values_p.get_bytes(0, values_size_p.get_int(0)).split("\0")
 
       Hash[keys.zip values]
@@ -232,18 +232,18 @@ module CephRuby
       ensure_open
 
       ret = Lib::Rbd.rbd_metadata_set(handle, key, value)
-      raise SystemCallError.new("Set of metadata failed.") if ret < 0
+      raise SystemCallError.new('Set of metadata failed') if ret < 0
       nil
     end
 
-    def get_parent_info
-      log("get_parent_info")
+    def parent_info
+      log("parent_info")
       ensure_open
 
       size = 8
 
       parent_poolname_p = nil
-      parent_name_p = nil
+      parent_name_p     = nil
       parent_snapname_p = nil
 
       loop do
@@ -251,7 +251,7 @@ module CephRuby
         break if size > 4096
 
         parent_poolname_p = FFI::MemoryPointer.new(:char, size)
-        parent_name_p = FFI::MemoryPointer.new(:char, size)
+        parent_name_p     = FFI::MemoryPointer.new(:char, size)
         parent_snapname_p = FFI::MemoryPointer.new(:char, size)
 
         ret = Lib::Rbd.rbd_get_parent_info(handle,
@@ -262,12 +262,13 @@ module CephRuby
 
         next if ret == -Errno::ERANGE::Errno
 
-        raise SystemCallError.new("Query parent info size failed:") if ret < 0
+        # No parent, return nil
+        return nil if ret < 0
 
         break
       end
 
-      raise SystemCallError.new("Query parent info size failed:") if size > 4096
+      raise SystemCallError.new('Query of parent info size failed') if size > 4096
 
       {
         pool: parent_poolname_p.get_bytes(0, size).split("\0")[0],
