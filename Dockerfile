@@ -18,4 +18,4 @@ RUN bundle install -j2
 
 COPY . /app
 
-CMD ["/app/bin/ceph-ruby"]
+CMD ["docker/start.sh"]
