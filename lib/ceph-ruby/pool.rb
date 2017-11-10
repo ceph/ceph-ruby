@@ -46,12 +46,12 @@ module CephRuby
 
       return [] if ret == 0
 
-      raise SystemCallError.new("Query size of list failed") if ret != -Errno::ERANGE::Errno
+      raise SystemCallError.new('Query size of list failed') if ret != -Errno::ERANGE::Errno
 
       list_p = FFI::MemoryPointer.new(:char, size.get_int(0))
       ret = Lib::Rbd.rbd_list(handle, list_p, size)
 
-      aise SystemCallError.new("Query list failed") if ret < 0
+      raise SystemCallError.new('Query list failed') if ret < 0
 
       list_p.get_bytes(0, ret).split("\0")
     end
