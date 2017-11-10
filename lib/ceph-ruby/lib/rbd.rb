@@ -36,6 +36,8 @@ module CephRuby
       attach_function 'rbd_clone', [:pointer, :string, :string, :pointer, :string, :uint64, :pointer], :int
       attach_function 'rbd_flatten', [:pointer], :int
 
+      attach_function 'rbd_list', [:pointer, :buffer_out, :pointer], :int
+
       class StatStruct < FFI::Struct
         layout :size, :uint64,
           :obj_size, :uint64,

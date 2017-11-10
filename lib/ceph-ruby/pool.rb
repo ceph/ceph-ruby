@@ -14,6 +14,24 @@ module CephRuby
       end
     end
 
+    def list
+      log("list")
+      size = FFI::MemoryPointer.new(:size_t)
+
+      ret = Lib::Rbd.rbd_list(handle, nil, size)
+
+      return [] if ret == 0
+
+      raise SystemCallError.new('Query size of list failed') if ret != -Errno::ERANGE::Errno
+
+      list_p = FFI::MemoryPointer.new(:char, size.get_int(0))
+      ret = Lib::Rbd.rbd_list(handle, list_p, size)
+
+      raise SystemCallError.new('Query list failed') if ret < 0
+
+      list_p.get_bytes(0, ret).split("\0")
+    end
+
     def exists?
       log("exists?")
       ret = Lib::Rados.rados_pool_lookup(cluster.handle, name)
