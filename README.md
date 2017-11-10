@@ -2,6 +2,9 @@
 
 Easy management of Ceph Distributed Storage System (rbd, images, rados objects) using ruby.
 
+## Development
+
+
 
 ## Installation
 
@@ -16,7 +19,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install ceph-ruby
-
 
 ## Usage
 
