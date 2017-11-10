@@ -194,6 +194,41 @@ module CephRuby
       raise SystemCallError.new("flatten of '#{name}' failed", -ret) if ret < 0
     end
 
+    def metadata
+      log("metadata")
+      ensure_open
+
+      keys_size_p   = FFI::MemoryPointer.new(:size_t)
+      values_size_p = FFI::MemoryPointer.new(:size_t)
+
+      ret = Lib::Rbd.rbd_metadata_list(handle, '', 0, nil, keys_size_p, nil, values_size_p)
+
+      return {} if ret == 0
+
+      raise SystemCallError.new('Query of metadata size failed') if ret != -Errno::ERANGE::Errno
+
+      keys_p   = FFI::MemoryPointer.new(:char, keys_size_p.get_int(0))
+      values_p = FFI::MemoryPointer.new(:char, values_size_p.get_int(0))
+
+      ret = Lib::Rbd.rbd_metadata_list(handle, "", 0, keys_p, keys_size_p, values_p, values_size_p)
+
+      raise SystemCallError.new('Query of metadata failed') if ret < 0
+
+      keys   = keys_p.get_bytes(0, keys_size_p.get_int(0)).split("\0")
+      values = values_p.get_bytes(0, values_size_p.get_int(0)).split("\0")
+
+      Hash[keys.zip values]
+    end
+
+    def metadata_set(key, value)
+      log("metadata_set #{key}")
+      ensure_open
+
+      ret = Lib::Rbd.rbd_metadata_set(handle, key, value)
+      raise SystemCallError.new('Set of metadata failed') if ret < 0
+      nil
+    end
+
     # helper methods below
 
     def open?
