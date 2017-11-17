@@ -2,6 +2,8 @@
 
 Easy management of Ceph Distributed Storage System (rbd, images, rados objects) using ruby.
 
+[![Build Status](https://travis-ci.org/ninech/ceph-ruby.svg?branch=master)](https://travis-ci.org/ninech/ceph-ruby)
+
 ## Development
 
 ```
