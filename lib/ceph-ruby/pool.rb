@@ -38,22 +38,24 @@ module CephRuby
       self.handle = nil
     end
 
+    # We first try to store all of the pools in a `nil` array. If it succeeds, it means we don't have any pools to list.
+    # If it fails, `rbd_list` will store the size it needs to display all pools into a variable.
     def list
       log("list")
-      size = FFI::MemoryPointer.new(:size_t)
 
-      ret = Lib::Rbd.rbd_list(handle, nil, size)
+      pool_size_needed_p = FFI::MemoryPointer.new(:size_t)
+      pools_list_p       = nil
+      ret                = Lib::Rbd.rbd_list(handle, pools_list_p, pool_size_needed_p)
 
-      return [] if ret == 0
-
+      return [] if ret.zero? # No pools to show
       raise SystemCallError.new('Query size of list failed') if ret != -Errno::ERANGE::Errno
 
-      list_p = FFI::MemoryPointer.new(:char, size.get_int(0))
-      ret = Lib::Rbd.rbd_list(handle, list_p, size)
+      pools_list_p = FFI::MemoryPointer.new(:char, pool_size_needed_p.get_int(0))
+      ret          = Lib::Rbd.rbd_list(handle, pools_list_p, pool_size_needed_p)
 
-      raise SystemCallError.new('Query list failed') if ret < 0
+      raise SystemCallError.new('Query list failed') if ret.negative?
 
-      list_p.get_bytes(0, ret).split("\0")
+      pools_list_p.get_bytes(0, ret).split("\0")
     end
 
     def rados_object(name, &block)
