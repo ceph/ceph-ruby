@@ -2,6 +2,19 @@
 
 Easy management of Ceph Distributed Storage System (rbd, images, rados objects) using ruby.
 
+## Development
+
+```
+docker-compose build
+docker-compose run app # Will open a console for you to work with
+```
+
+## Tests
+
+```
+docker-compose build
+docker-compose run app rspec
+```
 
 ## Installation
 
