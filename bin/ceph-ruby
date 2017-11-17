@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+require 'pry'
+
+APP_ROOT = File.join(File.dirname(Pathname.new(__FILE__).realpath), '..')
+
+$LOAD_PATH.unshift File.join(APP_ROOT, 'lib')
+$LOAD_PATH.unshift File.join(APP_ROOT, 'vendor/bundle')
+
+Dir.chdir(APP_ROOT)
+
+require 'bundler/setup'
+require 'ceph-ruby'
+
+binding.pry
