@@ -2,6 +2,21 @@
 
 Easy management of Ceph Distributed Storage System (rbd, images, rados objects) using ruby.
 
+![Build Status](https://travis-ci.org/ninech/ceph-ruby.svg?branch=master)
+
+## Development
+
+```
+docker-compose build
+docker-compose run app # Will open a console for you to work with
+```
+
+## Tests
+
+```
+docker-compose build
+docker-compose run app rspec
+```
 
 ## Installation
 
@@ -16,7 +31,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install ceph-ruby
-
 
 ## Usage
 
